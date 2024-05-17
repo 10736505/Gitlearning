@@ -1,10 +1,10 @@
 //Maya ASCII 2025 scene
 //Name: LightsaberModel2024.ma
-//Last modified: Wed, May 15, 2024 08:44:52 AM
+//Last modified: Wed, May 15, 2024 02:01:59 PM
 //Codeset: 1252
 requires maya "2025";
 requires "stereoCamera" "10.0";
-requires "mtoa" "5.4.0";
+requires -nodeType "aiOptions" -nodeType "aiAOVDriver" -nodeType "aiAOVFilter" "mtoa" "5.4.0";
 requires -nodeType "mayaUsdLayerManager" -dataType "pxrUsdStageData" "mayaUsdPlugin" "0.27.0";
 currentUnit -l centimeter -a degree -t film;
 fileInfo "application" "maya";
@@ -12,7 +12,7 @@ fileInfo "product" "Maya 2025";
 fileInfo "version" "2025";
 fileInfo "cutIdentifier" "202402161156-0caf8d1269";
 fileInfo "osv" "Windows 10 Pro v2009 (Build: 19045)";
-fileInfo "UUID" "3137A5B6-4CA6-836C-9F3A-2B877EF0B584";
+fileInfo "UUID" "AA02183C-421A-CE89-6B2F-948C417EFDA4";
 createNode transform -s -n "persp";
 	rename -uid "13390945-4A67-E074-351F-58BFFC3B0167";
 	setAttr ".v" no;
@@ -2169,9 +2169,6 @@ createNode polySoftEdge -n "polySoftEdge7";
 	setAttr ".ix" -type "matrix" 0.080084927277958337 0 0 0 0 -7.3301144420284944e-05 0.080084893731952364 0
 		 0 -0.080084893731952364 -7.3301144420284944e-05 0 0 2.2940031659616782 0.3286058259897322 1;
 	setAttr ".a" 180;
-createNode mayaUsdLayerManager -n "mayaUsdLayerManager1";
-	rename -uid "350CA83F-4E03-3D9D-86F7-5B84FBC1B32D";
-	setAttr ".sst" -type "string" "";
 createNode script -n "uiConfigurationScriptNode";
 	rename -uid "1A426FD2-4755-D4A1-BE94-B182DFDA70C9";
 	setAttr ".b" -type "string" (
@@ -2235,6 +2232,23 @@ createNode script -n "sceneConfigurationScriptNode";
 	rename -uid "92F28B21-43C1-BD8D-DBE0-D7818BC4C4A8";
 	setAttr ".b" -type "string" "playbackOptions -min 1 -max 120 -ast 1 -aet 200 ";
 	setAttr ".st" 6;
+createNode aiOptions -s -n "defaultArnoldRenderOptions";
+	rename -uid "167E71F5-48CB-2081-337C-F2A35FEB3216";
+	addAttr -ci true -sn "ARV_options" -ln "ARV_options" -dt "string";
+	setAttr ".version" -type "string" "5.4.0";
+createNode aiAOVFilter -s -n "defaultArnoldFilter";
+	rename -uid "EC4FDB55-4F87-B7E8-7D43-DFAFF90A9ABB";
+	setAttr ".ai_translator" -type "string" "gaussian";
+createNode aiAOVDriver -s -n "defaultArnoldDriver";
+	rename -uid "BDA576FE-4E4D-5025-209B-2D98A87F9BEA";
+	setAttr ".ai_translator" -type "string" "exr";
+createNode aiAOVDriver -s -n "defaultArnoldDisplayDriver";
+	rename -uid "B8EFE392-458F-18B7-04E7-4EA6C3A695BE";
+	setAttr ".ai_translator" -type "string" "maya";
+	setAttr ".output_mode" 0;
+createNode mayaUsdLayerManager -n "mayaUsdLayerManager1";
+	rename -uid "2E624F9A-40A3-B002-EA6E-F28DE7F3A018";
+	setAttr ".sst" -type "string" "";
 select -ne :time1;
 	setAttr -av -k on ".cch";
 	setAttr -av -k on ".ihi";
@@ -2488,6 +2502,8 @@ select -ne :hardwareRenderGlobals;
 	setAttr -k on ".bswa";
 	setAttr -k on ".shml";
 	setAttr -k on ".hwel";
+select -ne :ikSystem;
+	setAttr -s 4 ".sol";
 connectAttr "polySoftEdge5.out" "pCylinderShape1.i";
 connectAttr "polyBevel2.out" "pCubeShape1.i";
 connectAttr "polySoftEdge6.out" "pCylinderShape2.i";
@@ -2597,6 +2613,10 @@ connectAttr "polyBevel1.out" "polySoftEdge6.ip";
 connectAttr "pCylinderShape2.wm" "polySoftEdge6.mp";
 connectAttr "polySurfaceShape1.o" "polySoftEdge7.ip";
 connectAttr "pCylinderShape3.wm" "polySoftEdge7.mp";
+connectAttr ":defaultArnoldDisplayDriver.msg" ":defaultArnoldRenderOptions.drivers"
+		 -na;
+connectAttr ":defaultArnoldFilter.msg" ":defaultArnoldRenderOptions.filt";
+connectAttr ":defaultArnoldDriver.msg" ":defaultArnoldRenderOptions.drvr";
 connectAttr "defaultRenderLayer.msg" ":defaultRenderingList1.r" -na;
 connectAttr "pCylinderShape1.iog" ":initialShadingGroup.dsm" -na;
 connectAttr "pCubeShape1.iog" ":initialShadingGroup.dsm" -na;
